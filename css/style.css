@@ -1,0 +1,187 @@
+:root {
+    --primary-color: #ff4b2b;
+    --secondary-color: #ff416c;
+    --accent-blue: #00d2ff;
+    --accent-green: #1d976c;
+    --accent-orange: #ff8c00;
+    --bg-dark: #0f0c29;
+    --bg-gradient: linear-gradient(135deg, #dda420, #dda420, #dda420);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --text-color: #ffffff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-gradient);
+    color: var(--text-color);
+    font-family: 'Raleway', sans-serif;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.luckywheel {
+    margin: 20px auto;
+    max-width: 600px;
+    width: 90%;
+    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.luckywheel:hover {
+    transform: scale(1.02);
+}
+
+/* 12 Unique Vibrant Sector Colors */
+#_1 {
+    fill: #ff4b2b;
+}
+
+/* Radiant Red */
+#_2 {
+    fill: #00d2ff;
+}
+
+/* Sky Blue */
+#_3 {
+    fill: #1d976c;
+}
+
+/* Emerald Green */
+#_4 {
+    fill: #ff8c00;
+}
+
+/* Bright Orange */
+#_5 {
+    fill: #9d50bb;
+}
+
+/* Deep Purple */
+#_6 {
+    fill: #2193b0;
+}
+
+/* Ocean Blue */
+#_7 {
+    fill: #f12711;
+}
+
+/* Flare Red */
+#_8 {
+    fill: #f5af19;
+}
+
+/* Sun Yellow */
+#_9 {
+    fill: #00b09b;
+}
+
+/* Teal */
+#_10 {
+    fill: #ee0979;
+}
+
+/* Pink */
+#_11 {
+    fill: #4568dc;
+}
+
+/* Neon Blue */
+#_12 {
+    fill: #667eea;
+}
+
+/* Indigo */
+
+.frame,
+.sticks,
+.winIndicator,
+.wheelMiddle {
+    fill: #ffffff;
+}
+
+.winIndicator {
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+.labels text {
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Button Zone Enhancements */
+.buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn {
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 12px 35px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--glass-bg);
+    color: #fff;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+#btnPlay {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    border: none;
+}
+
+#btnPlay:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255, 75, 43, 0.4);
+    filter: brightness(1.1);
+}
+
+#btnSlowMo {
+    color: #fff;
+}
+
+#btnSlowMo:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .luckywheel {
+        width: 95%;
+    }
+
+    .btn {
+        padding: 10px 25px;
+        font-size: 0.9rem;
+    }
+}

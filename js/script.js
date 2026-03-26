@@ -9,21 +9,19 @@ $(document).ready(function () {
         tolerance,
         $btnPlay = $("#btnPlay");
 
-    // Inventory Configuration
+    // Inventory Configuration (Simplified: Single source of truth)
     const inventoryConfig = {
-        "2026-03-24": { "Tshirt": 5, "Mug": 5, "Notebook": 5, "Keychain": 5, "Pen": 5, "Umbrella": 5, "Totebag": 5 },
-        "2026-03-25": { "Tshirt": 5, "Mug": 5, "Notebook": 5, "Keychain": 5, "Pen": 5, "Umbrella": 5, "Totebag": 5 },
-        "2026-03-26": { "Tshirt": 5, "Mug": 5, "Notebook": 5, "Keychain": 5, "Pen": 5, "Umbrella": 5, "Totebag": 5 }
+        "Tshirt": 7, "Mug": 5, "Notebook": 5, "Keychain": 3, "Pen": 3, "Umbrella": 13, "Totebag": 10
     };
 
     // The Source of Truth: Sectors Array
     const sectors = [
-        "Tshirt", "Mug", "Notebook", "Keychain", "Pen", 
+        "Tshirt", "Mug", "Notebook", "Keychain", "Pen",
         "Umbrella", "Totebag", "Try Again", "Thank you"
     ];
 
     const colors = [
-        "#ff4b2b", "#00d2ff", "#1d976c", "#ff8c00", "#9d50bb", 
+        "#ff4b2b", "#00d2ff", "#1d976c", "#ff8c00", "#9d50bb",
         "#2193b0", "#f12711", "#f5af19", "#00b09b", "#ee0979"
     ];
 
@@ -84,29 +82,79 @@ $(document).ready(function () {
     drawWheel();
 
     // --- Inventory & Logic ---
+    const itemWeights = {
+        "Totebag": 35,
+        "Umbrella": 35,
+        "Tshirt": 30,
+        "Try Again": 10,
+        "Pen": 7,
+        "Keychain": 7,
+        "Notebook": 3,
+        "Mug": 3,
+        "Thank you": 5
+    };
+
     function getInventory() {
-        const today = new Date().toISOString().split('T')[0];
-        const activeDate = inventoryConfig[today] ? today : "2026-03-24";
-        let saved = localStorage.getItem('spin_inventory_' + activeDate);
-        if (saved) return { date: activeDate, items: JSON.parse(saved) };
-        return { date: activeDate, items: { ...inventoryConfig[activeDate] } };
+        const key = 'spin_inventory_v1';
+        let saved = localStorage.getItem(key);
+        if (saved) return JSON.parse(saved);
+        return { ...inventoryConfig };
     }
 
-    function saveInventory(date, items) {
-        localStorage.setItem('spin_inventory_' + date, JSON.stringify(items));
+    function saveInventory(items) {
+        localStorage.setItem('spin_inventory_v1', JSON.stringify(items));
     }
 
     function getItemToSpin() {
-        const currentData = getInventory();
+        const currentItems = getInventory();
         const availableItems = [];
-        for (let item in currentData.items) {
-            if (currentData.items[item] > 0) availableItems.push(item);
+
+        // 1. Collect all possible options
+        // Inventory items + static options ("Try Again", "Thank you")
+        const options = [...Object.keys(currentItems), "Try Again", "Thank you"];
+
+        // 2. Filter options that have stock (if they are in inventory)
+        options.forEach(item => {
+            if (currentItems[item] === undefined || currentItems[item] > 0) {
+                availableItems.push(item);
+            }
+        });
+
+        // 3. Calculate dynamic weights
+        // Weight = current stock for items, or fixed base weight for static options
+        let totalWeight = 0;
+        const weightsMap = {};
+
+        availableItems.forEach(item => {
+            let weight;
+            if (currentItems[item] !== undefined) {
+                // The more stock we have, the more likely it is to land on it
+                weight = currentItems[item];
+            } else {
+                // Static options use their base weights
+                weight = itemWeights[item] || 5;
+            }
+            weightsMap[item] = weight;
+            totalWeight += weight;
+        });
+
+        // 4. Weighted selection
+        let random = Math.random() * totalWeight;
+        let selection = availableItems.at(-1);
+
+        for (const item of availableItems) {
+            const weight = weightsMap[item];
+            if (random < weight) {
+                selection = item;
+                break;
+            }
+            random -= weight;
         }
-        availableItems.push("Try Again", "Thank you");
-        const selection = availableItems[Math.floor(Math.random() * availableItems.length)];
-        if (currentData.items[selection] !== undefined) {
-            currentData.items[selection]--;
-            saveInventory(currentData.date, currentData.items);
+
+        // 5. Update inventory if applicable
+        if (currentItems[selection] !== undefined) {
+            currentItems[selection]--;
+            saveInventory(currentItems);
         }
         return selection;
     }
@@ -123,18 +171,18 @@ $(document).ready(function () {
         const winner = getItemToSpin();
         const numSectors = sectors.length;
         const anglePerSector = 360 / numSectors;
-        
+
         const eligibleSectors = [];
         sectors.forEach((item, index) => {
             if (item === winner) eligibleSectors.push(index + 1);
         });
         const targetSectorIndex = eligibleSectors[Math.floor(Math.random() * eligibleSectors.length)] - 1;
-        
+
         // Indicator is at ~60deg. 
         // Sector i center angle is (i + 0.5) * anglePerSector
         const centerAngle = (targetSectorIndex + 0.5) * anglePerSector;
         const targetRotation = 60 - centerAngle;
-        
+
         const finalRotation = targetRotation + (360 * 5) + (lastRotation - (lastRotation % 360));
         lastRotation = finalRotation;
 
